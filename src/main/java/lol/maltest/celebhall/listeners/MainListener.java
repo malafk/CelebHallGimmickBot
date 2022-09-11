@@ -60,7 +60,7 @@ public class MainListener extends ListenerAdapter {
                 OptionMapping roleMapping = event.getOption("role");
                 OptionMapping roleTakeMapping = event.getOption("roletook");
 
-                ArrayList<String> answers = new ArrayList<>(Arrays.asList(answerMapping.getAsString().split(", ")));
+                ArrayList<String> answers = new ArrayList<>(Arrays.asList(answerMapping.getAsString().split(",")));
                 Long roleId = roleMapping.getAsRole().getIdLong();
                 Long takeId = null;
                 if(roleTakeMapping != null) {
@@ -77,8 +77,6 @@ public class MainListener extends ListenerAdapter {
                     throw new RuntimeException(e);
                 }
 
-                HashMap<Long, Long> tempMap = new HashMap<>();
-                tempMap.put(event.getChannel().getIdLong(), roleId);
                 discordBot.answerCache.add(new AnswerObject(event.getChannel().getIdLong(), roleId, takeId == null ? 0 : takeId, answers));
 
                 event.reply("✅ Saved the answers!").queue();
@@ -114,9 +112,7 @@ public class MainListener extends ListenerAdapter {
     public boolean containsAnswer(String text, Long id) {
         for(AnswerObject answerObject : discordBot.answerCache) {
             if(answerObject.channel.equals(id)) {
-                String[] arr = new String[answerObject.answers.size()];
-                arr = answerObject.answers.toArray(arr);
-                return stringContainsItemFromList(text.toLowerCase(), arr);
+                return stringContainsItemFromList(text.toLowerCase(), answerObject.answers);
             }
         }
         return false;
@@ -126,7 +122,7 @@ public class MainListener extends ListenerAdapter {
         for(AnswerObject answerObject : discordBot.answerCache) {
             Role take = guild.getRoleById(answerObject.roleToTake);
             Role role = guild.getRoleById(answerObject.roleToGive);
-            if(role != null) {
+            if(role == null) {
                 System.out.println("The role to give is null");
             }
             guild.addRoleToMember(UserSnowflake.fromId(member.getId()), role).queue();
@@ -136,7 +132,12 @@ public class MainListener extends ListenerAdapter {
         }
     }
 
-    public static boolean stringContainsItemFromList(String inputStr, String[] items) {
-        return Arrays.stream(items).anyMatch(inputStr::contains);
+    public boolean stringContainsItemFromList(String text, List<String> list) {
+        for (String i : list) {
+            if(text.contains(i)) {
+                return true;
+            }
+        }
+        return false;
     }
 }
