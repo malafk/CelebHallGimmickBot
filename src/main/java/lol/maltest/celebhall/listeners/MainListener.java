@@ -62,7 +62,10 @@ public class MainListener extends ListenerAdapter {
 
                 ArrayList<String> answers = new ArrayList<>(Arrays.asList(answerMapping.getAsString().split(", ")));
                 Long roleId = roleMapping.getAsRole().getIdLong();
-                Long takeId = roleTakeMapping.getAsRole().getIdLong();
+                Long takeId = null;
+                if(roleTakeMapping != null) {
+                    takeId = roleTakeMapping.getAsRole().getIdLong();
+                }
 
                 discordBot.dataConfig.set("channels." + event.getChannel().getId() + ".answers", answers);
                 discordBot.dataConfig.set("channels." + event.getChannel().getId() + ".roleId", roleId);
@@ -76,7 +79,7 @@ public class MainListener extends ListenerAdapter {
 
                 HashMap<Long, Long> tempMap = new HashMap<>();
                 tempMap.put(event.getChannel().getIdLong(), roleId);
-                discordBot.answerCache.add(new AnswerObject(event.getChannel().getIdLong(), roleId, takeId, answers));
+                discordBot.answerCache.add(new AnswerObject(event.getChannel().getIdLong(), roleId, takeId == null ? 0 : takeId, answers));
 
                 event.reply("✅ Saved the answers!").queue();
 
