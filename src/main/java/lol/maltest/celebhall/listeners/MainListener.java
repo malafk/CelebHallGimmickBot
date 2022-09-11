@@ -62,7 +62,7 @@ public class MainListener extends ListenerAdapter {
 
                 ArrayList<String> answers = new ArrayList<>(Arrays.asList(answerMapping.getAsString().split(", ")));
                 Long roleId = roleMapping.getAsRole().getIdLong();
-                Long takeId = roleMapping.getAsRole().getIdLong();
+                Long takeId = roleTakeMapping.getAsRole().getIdLong();
 
                 discordBot.dataConfig.set("channels." + event.getChannel().getId() + ".answers", answers);
                 discordBot.dataConfig.set("channels." + event.getChannel().getId() + ".roleId", roleId);
